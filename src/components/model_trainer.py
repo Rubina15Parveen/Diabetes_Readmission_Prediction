@@ -29,11 +29,11 @@ class ModelTrainer:
             logging.info("Splitting the training and test input data")
             def split_X_y(arr):
                 X = arr[:, :-1]
-                y_col = arr[:, -1]          # (n, 1) sparse/dense
+                y_col = arr[:, -1]         
                 if sparse.issparse(y_col):
-                    y = y_col.toarray().ravel()   # -> (n,)
+                    y = y_col.toarray().ravel() 
                 else:
-                    y = np.asarray(y_col).ravel() # -> (n,)
+                    y = np.asarray(y_col).ravel() 
                 return X, y
             X_train, y_train = split_X_y(train_array)
             X_test,  y_test  = split_X_y(test_array)
@@ -44,7 +44,14 @@ class ModelTrainer:
                     max_iter=2000, 
                     class_weight='balanced'
                 ), 
-                "Random Forest Classifier" : RandomForestClassifier(), 
+                "Random Forest Classifier" : RandomForestClassifier(
+                    n_estimators=200,   
+                    max_depth=18,     
+                    min_samples_split=5,
+                    class_weight="balanced",
+                    random_state=42,
+                    n_jobs=-1
+                ), 
                 "XGBoost Classifier" : XGBClassifier(
                     objective="binary:logistic",
                     eval_metric="auc",
@@ -52,7 +59,7 @@ class ModelTrainer:
                     random_state=42,
                     n_jobs=-1
                 ), 
-                #"CatBoost Classifier" : CatBoostClassifier()
+            
             }
 
             model_report: dict=evaluate_model(X_train=X_train, y_train=y_train, X_test = X_test, y_test = y_test, 
